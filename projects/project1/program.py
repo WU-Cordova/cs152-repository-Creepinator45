@@ -29,6 +29,8 @@ class CardFace(Enum):
 class Card:
     face: CardFace
     suit: CardSuit
+    def __str__(self) -> str:
+        return f"{self.face.value} of {self.suit.value}"
 
 class MultiDeck:
     single_deck = {Card(face = card[0], suit = card[1]) for card in product(list(CardFace), list(CardSuit))}
