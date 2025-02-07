@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
-from itertools import product
+from itertools import product, zip_longest
+from typing import Iterable, Optional
 from datastructures.bag import Bag
 from random import choices, randint
 
@@ -29,33 +30,140 @@ class CardFace(Enum):
 class Card:
     face: CardFace
     suit: CardSuit
+    val: int
     def __str__(self) -> str:
         return f"{self.face.value} of {self.suit.value}"
 
 class MultiDeck:
-    single_deck = {Card(face = card[0], suit = card[1]) for card in product(list(CardFace), list(CardSuit))}
+    #generates a single deck of cards, represented as a set, aces are given the value 1 by default
+    single_deck = {Card(face = face, suit = suit, val=val) for ((face, val), suit) in product(zip_longest(list(CardFace), range(1,11), fillvalue=10), list(CardSuit))}
+
     def __init__(self, numDecks:int = 1):
         self.__deck: Bag = Bag(*(list(MultiDeck.single_deck)*numDecks))
     
     def dealCard(self) -> Card:
+        """
+        Deal a random card from the deck, removing it from the deck and returning the card
+        O(n) for cards in deck
+        """
+
         #choice = choices(population = self.__deck.distinct_items(), 
         #                 weights = [self.__deck.count(card_type) for card_type in self.__deck.distinct_items()])
         #return choice
         #I wanted to deal cards using choices with probabilities weighted by the number of each card in the deck, but this isn't working for some reason
         
         choiceIndex = randint(0, len(self.__deck))
+        #counts out cards from the deck until reaching the chosen card
         for card in self.__deck.distinct_items():
             choiceIndex -= self.__deck.count(card)
             if choiceIndex <= 0:
                 chosenCard = card
                 break
+        
         self.__deck.remove(chosenCard)
         return chosenCard
+
+class Player:
+    def __init__(self, name: str, hand: Iterable[Card] = []):
+        self.__name: str = name
+        self.__hand: list[Card] = list(hand)
+        self.__handValue: int = Player.calculateHand(hand = self.__hand)
+
+    def status(self, open: bool = True) -> str:
+        """
+        return string representation of the player's hand, in the form of "{self.__name}'s hand is {hand}, and the total is {self.__handValue}"
+        if open is true will return all cards, if open is false will obscure the first card
+        O(n) for cards in hand
+        """
+        #I would have used __str__ for this, but I wanted it to be passed the parameter for whether to show or conceal the first card
+        #I'm also undecided if I like this function living inside the player class, or if I'd rather define it inside of the beginGame function
+        if open:
+            hiddenCard = f"{self.__hand[0]} (face down)"
+        else:
+            hiddenCard = "face down"
+        hand = ", ".join([str(card) for card in [hiddenCard] + self.__hand[1:]])
+
+        return f"{self.__name}'s hand is {hand}, and the total is {self.__handValue}"
+
+    @property
+    def handValue(self) -> int:
+        return self.__handValue
     
+    @property
+    def name(self) -> str:
+        return self.__name
+    
+    @name.setter
+    def name(self, name: str) -> None:
+        self.__name = name
+    
+    @property
+    def hand(self) -> list[Card]:
+        return self.__hand
+    
+    def calculateHand(hand: Iterable[Card]) -> int:
+        """
+        Calculates the value of a given hand of 
+        O(n) for cards in hand
+        """
+
+        containsAce = False
+        total = 0
+        for card in hand:
+            containsAce = containsAce or card.face == CardFace.ACE
+            total += card.val
+        #Makes aces worth 11 if they fit in the hand
+        if containsAce and total <= 11:
+            total += 10
+        
+        return total
+    
+    def addCard(self, card: Card) -> None:
+        """
+        Add a given card to the player's hand
+        O(n) for cards in hand
+        """
+
+        self.__hand.append(card)
+        #This could be made O(1) by calculating the new value based on the previous value, instead of recalculating it from scratch
+        self.__handValue = Player.calculateHand(self.__hand)
+
+class Game:
+    def __init__(self, player1_name:str = "Player", player2_name:str = "Dealer"):
+        self.__player1: Player = Player(player1_name)
+        self.__player2: Player = Player(player2_name)
+    
+    def beginGame(self, numDecks: Optional[int] = None) -> None:
+        """
+        Begins and runs a game of Bag Jack
+        """
+
+        #initializing game
+        print(f"{self.__player1.name} is playing Bag Jack against {self.__player2.name}")
+
+        #randomly selects number of decks from 2, 4, 6, and 8 if none is supplied
+        if numDecks is None:
+            numDecks = 2 * randint(1, 4)
+
+        deck = MultiDeck(numDecks=numDecks)
+
+        #drawing starting hands
+        self.__player1.addCard(deck.dealCard())
+        self.__player1.addCard(deck.dealCard())
+        print(self.__player1.status(open=True))
+
+        self.__player2.addCard(deck.dealCard())
+        self.__player2.addCard(deck.dealCard())
+        print(self.__player2.status(open=False))
+
+
 def main():
     print("Hello, World!")
+    game = Game()
+    game.beginGame()
 
 
 
 if __name__ == '__main__':
     main()
+    pass
