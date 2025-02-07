@@ -19,7 +19,19 @@ from datastructures.iarray import IArray, T
 class Array(IArray[T]):  
 
     def __init__(self, starting_sequence: Sequence[T]=[], data_type: type=object) -> None: 
-        raise NotImplementedError('Constructor not implemented.')
+        if not isinstance(starting_sequence, Sequence):
+            raise TypeError("starting_sequence must be a valid sequence type")
+        for item in starting_sequence:
+            raise TypeError(f"Item {repr(item)} is not of type {str(data_type)}")
+
+        self.__logical_size: int = len(starting_sequence)
+        self.__physical_size: int = self.__logical_size
+        self.__data_type: type = data_type
+
+        self__items: NDArray = np.empty(self.__physical_size, dtype = self.__data_type)
+
+        for i in range(self.__logical_size):
+            self.__items[i] = starting_sequence[i]
 
     @overload
     def __getitem__(self, index: int) -> T: ...
