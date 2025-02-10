@@ -51,7 +51,19 @@ class Game:
         self.__player2.addCard(deck.dealCard())
         self.__player2.addCard(deck.dealCard())
         print(player_status(self.__player2, open=False))
-        #todo check for blackjacks
+        
+        #check for black jacks. Early return if found
+        if self.__player1.handValue == 21 and self.__player2.handValue == 21:
+            print(player_status(self.__player2, open=True))
+            print("Double Black Jack! It's a tie!")
+            return
+        elif self.__player1.handValue == 21:
+            print(f"Black Jack! {self.__player1.name} wins!")
+            return
+        elif self.__player2.handValue == 21:
+            print(player_status(self.__player2, open=True))
+            print(f"Black Jack! {self.__player2.name} wins!")
+            return
 
         #player's turn
         print(f"{self.__player1.name}'s turn")
