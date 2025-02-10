@@ -221,10 +221,33 @@ class Game:
             print("Tie!")
         return
 
+    def beginGames(self) -> None:
+        """
+        Plays bagjack with a random number of decks and offers a rematch until the player declines
+        """
+
+        print("Let's play some Bag Jack!")
+        play_again = True
+        while play_again:
+            #Play a single game of bagjack
+            self.beginGame()
+            #Ask for a rematch
+            while True:
+                input_choice = input("Would you like to play again? (y/n):")
+                match input_choice:
+                    case "y":
+                        break
+                    case "n":
+                        play_again = False
+                        break
+                    case _:
+                        print(f"{input_choice} was not a valid decision")
+        print("Thanks for playing!")
+
 def main():
-    print("Hello, World!")
-    game = Game()
-    game.beginGame()
+    player_name = input("Hello! What's your name? ")
+    game = Game(player1_name=player_name)
+    game.beginGames()
 
 if __name__ == '__main__':
     main()
