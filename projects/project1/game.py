@@ -13,6 +13,24 @@ class Game:
         Begins and runs a game of Bag Jack
         """
 
+        #function for formatting a given player's hand for printing
+        def player_status(player: Player, open: bool = True) -> str:
+            """
+            return string representation of the player's hand, in the form of "{self.__name}'s hand is {hand}, and the total is {self.__handValue}"
+            if open is true will return all cards, if open is false will obscure the first card. Will not include total if open is false
+            O(n) for cards in hand
+            """
+            if open:
+                hiddenCard = f"{player.hand[0]} (face down)"
+            else:
+                hiddenCard = "face down"
+            hand = ", ".join([str(card) for card in [hiddenCard] + player.hand[1:]])
+
+            if open:
+                return f"{player.name}'s hand is {hand}, and the total is {player.handValue}"
+            else:
+                return f"{player.name}'s hand is {hand}"
+
         #setting up the game
         self.__player1.clearHand()
         self.__player2.clearHand()
@@ -28,11 +46,11 @@ class Game:
         #drawing starting hands
         self.__player1.addCard(deck.dealCard())
         self.__player1.addCard(deck.dealCard())
-        print(self.__player1.status(open=True))
+        print(player_status(self.__player1, open=True))
 
         self.__player2.addCard(deck.dealCard())
         self.__player2.addCard(deck.dealCard())
-        print(self.__player2.status(open=False))
+        print(player_status(self.__player2, open=False))
         #todo check for blackjacks
 
         #player's turn
@@ -42,7 +60,7 @@ class Game:
             match input_choice:
                 case "h":
                     self.__player1.addCard(deck.dealCard())
-                    print(self.__player1.status(open=True))
+                    print(player_status(self.__player1, open=True))
 
                     #exit game if busted
                     if self.__player1.handValue > 21:
@@ -59,15 +77,15 @@ class Game:
                     #ask for input again if not give "h" or "s"
                     print(f"{input_choice} was not a valid decision")
                     continue
-        print(self.__player1.status(open=True))
+        print(player_status(self.__player1, open=True))
 
         #CPU's turn
         print(f"{self.__player2.name}'s turn")
-        print(self.__player2.status(open=True))
+        print(player_status(self.__player2, open=True))
         while self.__player2.handValue < 17:
             print(f"{self.__player2.name} takes a card")
             self.__player2.addCard(deck.dealCard())
-            print(self.__player2.status(open=True))
+            print(player_status(self.__player2, open=True))
 
             #exit game if busted
             if self.__player2.handValue > 21:
@@ -76,8 +94,8 @@ class Game:
         print(f"{self.__player2.name} stays")
 
         #print the final hands
-        print(self.__player1.status(True))
-        print(self.__player2.status(True))
+        print(player_status(self.__player1, open=True))
+        print(player_status(self.__player2, open=True))
 
         #check for winner
         if self.__player1.handValue > self.__player2.handValue:

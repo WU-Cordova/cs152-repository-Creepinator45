@@ -8,25 +8,6 @@ class Player:
         self.__hand: list[Card] = []
         self.__handValue: int = 0
 
-    def status(self, open: bool = True) -> str:
-        """
-        return string representation of the player's hand, in the form of "{self.__name}'s hand is {hand}, and the total is {self.__handValue}"
-        if open is true will return all cards, if open is false will obscure the first card. Will not include total if open is false
-        O(n) for cards in hand
-        """
-        #I would have used __str__ for this, but I wanted it to be passed the parameter for whether to show or conceal the first card
-        #I'm also undecided if I like this function living inside the player class, or if I'd rather define it inside of the beginGame function
-        if open:
-            hiddenCard = f"{self.__hand[0]} (face down)"
-        else:
-            hiddenCard = "face down"
-        hand = ", ".join([str(card) for card in [hiddenCard] + self.__hand[1:]])
-
-        if open:
-            return f"{self.__name}'s hand is {hand}, and the total is {self.__handValue}"
-        else:
-            return f"{self.__name}'s hand is {hand}"
-
     @property
     def handValue(self) -> int:
         return self.__handValue
