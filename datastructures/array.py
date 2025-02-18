@@ -55,7 +55,7 @@ class Array(IArray[T]):
             
             stop = self.__item_count if index.stop is None else index.stop
             #stop = index.stop
-            if not (stop is None or self.__in_range(stop)): #shortcircuited or means that self.__in_range won't raise error if index is None
+            if not (stop is None or self.__in_range(stop-1)): #shortcircuited or means that self.__in_range won't raise error if index is None
                 raise IndexError(f"Stop index {stop} out of bounds. Array length is {self.__item_count}")
             
             step = 1 if index.step is None else index.step
@@ -214,7 +214,7 @@ class Array(IArray[T]):
         return f'Array {self.__str__()}, Logical: {self.__item_count}, Physical: {len(self.__items)}, type: {self.__data_type}'
     
     def __in_range(self, index: int) -> bool:
-        return -self.__item_count <= index <= self.__item_count
+        return -self.__item_count <= index < self.__item_count
     
     def __resize(self, new_size: int) -> None:
         """
