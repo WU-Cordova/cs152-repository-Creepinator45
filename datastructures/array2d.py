@@ -105,6 +105,8 @@ class Array2D(IArray2D[T]):
         """
         maps 2d index onto flattened array2d, sliced by rows
         """
+        if col_index < 0:
+            row_index += 1
         return row_index * cols_len + col_index
 
 
