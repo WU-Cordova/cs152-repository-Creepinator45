@@ -26,6 +26,12 @@ class Cell:
     def __str__(self) -> str:
         return " `" if self.isBoarder else " x" if self.isAlive else " -"
 
+    def __eq__(self, value) -> bool:
+        if not isinstance(value, Cell):
+            return False
+        
+        return (self.isBoarder and value.isBoarder) or (self.isAlive == value.isAlive)
+
 class Grid:
     def __init__(self, rows: int = 32, cols: int = 32) -> None:
         self.__grid: IArray2D = Array2D.empty(rows, cols, Cell)
@@ -58,8 +64,24 @@ class Grid:
                     continue
                 yield ((i, j), cell)
     
+    def __len__(self) -> int:
+        return len(self.__grid) * len(self.__grid[0])
+    
     def __str__(self) -> str:
         return f"{"\n".join(f"{"".join(f"{str(cell)}" for cell in row)}" for row in self.__grid)}" 
+    
+    def __eq__(self, value) -> bool:
+        if not isinstance(value, Grid):
+            return False
+        
+        if len(self) != len(value):
+            return False
+        
+        for (_, cell1), (_, cell2) in zip(self, value):
+            if cell1 != cell2:
+                return False
+            
+        return True
     
     def checkCell(self, row, col) -> bool:
         """
@@ -86,24 +108,33 @@ class Grid:
                 return False
 
 class GameController:
-    def __init__(self, rows: int = 32, cols: int = 32) -> None:
+    def __init__(self, rows: int = 32, cols: int = 32, history_length:int = 5) -> None:
         self.__dimensions: tuple[int, int] = (rows, cols)
         self.__activeGrid: Grid = Grid.randomGrid(*self.__dimensions)
-        self.__pastGrids: list[Grid] = []
+        #this would be better as a fixed length array instead than a list, but I'd rather it hold references instead of deepcopies, so our Array implementation is unsuitable
+        self.__pastGrids: list[Grid] = [Grid(*self.__dimensions) for _ in range(history_length)]
         self.__iteration: int = 0
 
     def nextIteration(self):
         self.__iteration += 1
-        self.__pastGrids.append(self.__activeGrid)
+        pastGridIndex = self.__iteration % len(self.__pastGrids)
+        self.__pastGrids[pastGridIndex] = self.__activeGrid
+
         self.__activeGrid = Grid(*self.__dimensions)
         for position, cell in self.__activeGrid:
-            cell.isAlive = self.__pastGrids[-1].checkCell(*position)
+            cell.isAlive = self.__pastGrids[pastGridIndex].checkCell(*position)
     
     def run(self):
-        while True:
+        hasLooped: bool = False
+        while not hasLooped:
             self.nextIteration()
-            print(self.__activeGrid)
+            print(self)
             sleep(1)
+            for grid in self.__pastGrids:
+                hasLooped = hasLooped or grid == self.__activeGrid
+    
+    def __str__(self) -> str:
+        return f"Generation {self.__iteration}\n{str(self.__activeGrid)}"
 
 def main():
     game = GameController()
