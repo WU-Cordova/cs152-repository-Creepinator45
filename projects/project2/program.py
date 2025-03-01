@@ -2,6 +2,7 @@ from datastructures.array2d import Array2D, IArray2D
 from typing import Optional, Sequence, Iterator
 from dataclasses import dataclass
 from random import random
+from time import sleep
 
 class Cell:
     def __init__(self) -> None:
@@ -23,7 +24,7 @@ class Cell:
             self.__isAlive = isAlive
 
     def __str__(self) -> str:
-        return "`" if self.isBoarder else "x" if self.isAlive else "-"
+        return " `" if self.isBoarder else " x" if self.isAlive else " -"
 
 class Grid:
     def __init__(self, rows: int = 32, cols: int = 32) -> None:
@@ -83,16 +84,31 @@ class Grid:
                 return True
             case 4|5|6|7|8:
                 return False
-        
+
+class GameController:
+    def __init__(self, rows: int = 32, cols: int = 32) -> None:
+        self.__dimensions: tuple[int, int] = (rows, cols)
+        self.__activeGrid: Grid = Grid.randomGrid(*self.__dimensions)
+        self.__pastGrids: list[Grid] = []
+        self.__iteration: int = 0
+
+    def nextIteration(self):
+        self.__iteration += 1
+        self.__pastGrids.append(self.__activeGrid)
+        self.__activeGrid = Grid(*self.__dimensions)
+        for position, cell in self.__activeGrid:
+            cell.isAlive = self.__pastGrids[-1].checkCell(*position)
+    
+    def run(self):
+        while True:
+            self.nextIteration()
+            print(self.__activeGrid)
+            sleep(1)
 
 def main():
-    grid = Grid()
-    print(grid)
-    smallGrid = Grid(3, 3)
+    game = GameController()
+    game.run()
     print("Hello, World!")
-
-
-
 
 if __name__ == '__main__':
     main()
