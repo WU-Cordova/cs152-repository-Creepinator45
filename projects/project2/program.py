@@ -110,19 +110,18 @@ class Grid:
 class GameController:
     def __init__(self, rows: int = 32, cols: int = 32, history_length:int = 5) -> None:
         self.__dimensions: tuple[int, int] = (rows, cols)
-        self.__activeGrid: Grid = Grid.randomGrid(*self.__dimensions)
         #this would be better as a fixed length array instead than a list, but I'd rather it hold references instead of deepcopies, so our Array implementation is unsuitable
-        self.__pastGrids: list[Grid] = [Grid(*self.__dimensions) for _ in range(history_length)]
+        self.__grids: list[Grid] = [Grid(*self.__dimensions) for _ in range(history_length+1)]
+        self.__grids[0] = Grid.randomGrid(*self.__dimensions)
         self.__iteration: int = 0
+        self.__currentGridIndex:int = 0
 
     def nextIteration(self):
         self.__iteration += 1
-        pastGridIndex = self.__iteration % len(self.__pastGrids)
-        self.__pastGrids[pastGridIndex] = self.__activeGrid
+        self.__currentGridIndex = self.__iteration % len(self.__grids)
 
-        self.__activeGrid = Grid(*self.__dimensions)
-        for position, cell in self.__activeGrid:
-            cell.isAlive = self.__pastGrids[pastGridIndex].checkCell(*position)
+        for position, cell in self.__grids[self.__currentGridIndex]:
+            cell.isAlive = self.__grids[self.__currentGridIndex-1].checkCell(*position)
     
     def run(self):
         hasLooped: bool = False
@@ -130,11 +129,13 @@ class GameController:
             self.nextIteration()
             print(self)
             sleep(1)
-            for grid in self.__pastGrids:
-                hasLooped = hasLooped or grid == self.__activeGrid
+            for i, grid in enumerate(self.__grids):
+                if i == self.__currentGridIndex:
+                    continue
+                hasLooped = hasLooped or grid == self.__grids[self.__currentGridIndex]
     
     def __str__(self) -> str:
-        return f"Generation {self.__iteration}\n{str(self.__activeGrid)}"
+        return f"Generation {self.__iteration}\n{str(self.__grids[self.__currentGridIndex])}"
 
 def main():
     game = GameController()
