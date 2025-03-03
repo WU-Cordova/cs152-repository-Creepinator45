@@ -24,7 +24,7 @@ class Cell:
             self.__isAlive = isAlive
 
     def __str__(self) -> str:
-        return " `" if self.isBoarder else " x" if self.isAlive else " -"
+        return "" if self.isBoarder else " x" if self.isAlive else " -"
 
     def __eq__(self, value) -> bool:
         if not isinstance(value, Cell):
