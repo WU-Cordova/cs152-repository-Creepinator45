@@ -1,5 +1,6 @@
 from datastructures.array2d import Array2D, IArray2D
-from typing import Optional, Sequence, Iterator
+from typing import Optional, Sequence, Iterator, TextIO
+from projects.project2.kbhit import KBHit
 from dataclasses import dataclass
 from random import random
 from time import sleep
@@ -115,6 +116,39 @@ class GameController:
         self.__grids[0] = Grid.randomGrid(*self.__dimensions)
         self.__iteration: int = 0
         self.__currentGridIndex:int = 0
+    
+    @staticmethod
+    def fromArray2D(startingArray: Array2D[Cell], history_length: int = 5) -> "GameController":
+        output = GameController(len(startingArray), len(startingArray[0]), history_length)
+
+
+    @staticmethod
+    def fromConfig(config: TextIO) -> "GameController":
+        nonCommentLines = 0
+        for line in config.readlines():
+            if line[0] == "#":
+                continue
+            line = "".join(line.split())
+
+            match nonCommentLines:
+                case 0:
+                    rows = int(line)
+                case 1:
+                    cols = int(line)
+                case _:
+                    for char in line:
+                        match char:
+                            case "-":
+                                pass
+                            case "x":
+                                pass
+                            case "#":
+                                break
+            
+
+            print(line)
+
+            nonCommentLines += 1
 
     def nextIteration(self):
         self.__iteration += 1
@@ -125,19 +159,34 @@ class GameController:
     
     def run(self):
         hasLooped: bool = False
+        kbhit = KBHit()
         while not hasLooped:
+            sleep(1)
+            if kbhit.kbhit():
+                key = kbhit.getch()
+
+                print(key)
+
+                #match key:
+                #    case "q":
+                #        print("ended by keyboard input")
+                #        break
+                #    case n if n.isdigit():
+                #        print(n)
+
             self.nextIteration()
             print(self)
-            sleep(1)
             for i, grid in enumerate(self.__grids):
                 if i == self.__currentGridIndex:
                     continue
                 hasLooped = hasLooped or grid == self.__grids[self.__currentGridIndex]
-    
+
     def __str__(self) -> str:
         return f"Generation {self.__iteration}\n{str(self.__grids[self.__currentGridIndex])}"
 
 def main():
+    #with open(r"projects\project2\lifeConfig.txt", "r") as config:
+    #    GameController.fromConfig(config)
     game = GameController()
     game.run()
     print("Hello, World!")
