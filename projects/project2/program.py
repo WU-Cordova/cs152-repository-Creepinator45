@@ -4,6 +4,7 @@ from projects.project2.kbhit import KBHit
 from dataclasses import dataclass
 from random import random
 from time import sleep
+from itertools import chain
 
 class Cell:
     def __init__(self) -> None:
@@ -119,8 +120,11 @@ class GameController:
     
     @staticmethod
     def fromArray2D(startingArray: Array2D[Cell], history_length: int = 5) -> "GameController":
-        output = GameController(len(startingArray), len(startingArray[0]), history_length)
-
+        #add rows and cols for boarder
+        output = GameController(len(startingArray)+2, len(startingArray[0])+2, history_length)
+        for (_, cell), startingCell in zip(output.__grids[output.__currentGridIndex], chain.from_iterable(startingArray)):
+            cell.isAlive = startingCell.isAlive
+        return output
 
     @staticmethod
     def fromConfig(config: TextIO) -> "GameController":
@@ -132,23 +136,24 @@ class GameController:
 
             match nonCommentLines:
                 case 0:
-                    rows = int(line)
+                    historyLen = int(line)
                 case 1:
+                    rows = int(line)
+                case 2:
                     cols = int(line)
+                    startingGrid = Array2D([[Cell() for _ in range(rows)] for _ in range(cols)])
                 case _:
-                    for char in line:
+                    rowNum = nonCommentLines-3
+                    for colNum, char in enumerate(line):
                         match char:
                             case "-":
                                 pass
                             case "x":
-                                pass
+                                startingGrid[rowNum][colNum].isAlive = True
                             case "#":
                                 break
-            
-
-            print(line)
-
             nonCommentLines += 1
+        return(GameController.fromArray2D(startingGrid, historyLen))
 
     def nextIteration(self):
         self.__iteration += 1
@@ -185,9 +190,8 @@ class GameController:
         return f"Generation {self.__iteration}\n{str(self.__grids[self.__currentGridIndex])}"
 
 def main():
-    #with open(r"projects\project2\lifeConfig.txt", "r") as config:
-    #    GameController.fromConfig(config)
-    game = GameController()
+    with open(r"projects\project2\lifeConfig.txt", "r") as config:
+        game = GameController.fromConfig(config)
     game.run()
     print("Hello, World!")
 
