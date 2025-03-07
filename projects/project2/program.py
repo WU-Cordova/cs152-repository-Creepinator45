@@ -118,7 +118,7 @@ class GameController:
         self.__grids[0] = Grid.randomGrid(*self.__dimensions)
         self.__iteration: int = 0
         self.__currentGridIndex:int = 0
-    
+
     @staticmethod
     def fromArray2D(startingArray: Array2D[Cell], history_length: int = 5) -> "GameController":
         #add rows and cols for boarder
@@ -156,6 +156,91 @@ class GameController:
             nonCommentLines += 1
         return(GameController.fromArray2D(startingGrid, historyLen))
 
+    @staticmethod
+    def fromUserInput() -> "GameController":
+        def askYesOrNo(question: str) -> bool:
+            """
+            Ask a yes or no question
+            Return True if y, false if n
+            If not y or n, re-ask question
+            """
+            while True:
+                match input(question):
+                    case "y":
+                        return True
+                    case "n":
+                        return False
+                    case _:
+                        print("Invalid input, please answer with \"y\" or \"n\"")
+        def askNumerical(question: str) -> int:
+            """
+            Ask numerical question
+            Return integer answer
+            If invalid int, re-ask question
+            """
+            while True:
+                rawInput = input(question)
+                try:
+                    answer =  int(rawInput)
+                except:
+                    print("Invalid numerical input")
+                else:
+                    return answer
+        def askConfig(question: str) -> GameController:
+            """
+            Ask for config file path
+            Return game initialized from config
+            If invalid config file, re-ask question
+            """
+            while True:
+                rawConfigFile = input(question)
+                try:
+                    with open(path.normpath(rawConfigFile), "r") as config:
+                        game = GameController.fromConfig(config)
+                except:
+                    print("Invalid config file")
+                else:
+                    return game
+        def askCoordinate(question: str, maximum: tuple[Optional[int], Optional[int]] = (10000, 10000)) -> tuple[int, int]:
+            """
+            Ask for coordinate, formatted as "x,y"
+            Return coordinate
+            If invalid coordinate, re-ask question and prompt for correct formatting
+            """
+            while True:
+                rawCoordinateInput = input(question)
+                try:
+                    coordinate = rawCoordinateInput.split(",")
+                    x, y = coordinate[0], coordinate[1]
+                except:
+                    print("Invalid coordinate")
+                    print("Proper formatting is \"x,y\"")
+                else:
+                    if x>maximum[0]:
+                        print("x out of range")
+                        continue
+                    if y>maximum[1]:
+                        print("y out of range")
+                        continue
+                    return (x,y)
+
+        if askYesOrNo("Read from config file (y/n)? "):
+            return askConfig("Config file path: ")
+        else:
+            historyLen = askNumerical("How long is history length? ")
+            rows = askNumerical("Length in x: ")
+            cols = askNumerical("Length in y: ")
+            if askYesOrNo("Manually input starting cells (y/n)? "):
+                print("Note: it's reccomended to use a config file for extensive starting cell arrangements")
+                startingArrangement = Array2D.empty(rows, cols, data_type=Cell)
+                numberOfStartingCells = askNumerical("How many starting cells? ")
+                for _ in range(numberOfStartingCells):
+                    x,y = askCoordinate("Coordinate of live cell (x,y): ", (rows, cols))
+                    startingArrangement[x][y].isAlive = True
+                return GameController.fromArray2D(startingArrangement, historyLen)
+            else:
+                return GameController(rows, cols, historyLen)
+        
     def nextIteration(self):
         self.__iteration += 1
         self.__currentGridIndex = self.__iteration % len(self.__grids)
@@ -191,76 +276,7 @@ class GameController:
         return f"Generation {self.__iteration}\n{str(self.__grids[self.__currentGridIndex])}"
 
 def main():
-    #input handling spaghetti. There's probably a better way to do this, but at least this way the program doesn't crash from 1 incorrect user input
-    #I hate doing UI
-    recievedValidUseConfigFileAnswer:bool = False
-    while not recievedValidUseConfigFileAnswer:
-        rawUseConfigFileAnswer = input("Read from config file (y/n)? ")
-        match rawUseConfigFileAnswer:
-            case "y":
-                recievedValidUseConfigFileAnswer = True
-
-                recievedValidConfigFile = False
-                while not recievedValidConfigFile:
-                    rawConfigFile = input("Config file path: ")
-                    try:
-                        with open(path.normpath(rawConfigFile), "r") as config:
-                            game = GameController.fromConfig(config)
-                    except:
-                        print("Invalid config file")
-                        continue
-                    else:
-                        recievedValidConfigFile = True
-            case "n":
-                recievedValidUseConfigFileAnswer = True
-
-                recievedValidHistoryLenInput = False
-                while not recievedValidHistoryLenInput:
-                    rawHistoryLenInput = input("How long is history length?")
-                    try:
-                        historyLen = int(rawHistoryLenInput)
-                    except:
-                        print("Invalid history length number")
-                        continue
-                    else:
-                        recievedValidHistoryLenInput = True
-                
-                recievedValidRowInput = False
-                while not recievedValidRowInput:
-                    rawRowInput = input("How many rows?")
-                    try:
-                        rows = int(rawRowInput)
-                    except:
-                        print("Invalid row number")
-                        continue
-                    else:
-                        recievedValidRowInput = True
-                
-                recievedValidColInput = False
-                while not recievedValidColInput:
-                    rawColInput = input("How many cols?")
-                    try:
-                        cols = int(rawColInput)
-                    except:
-                        print("Invalid col number")
-                        continue
-                    else:
-                        recievedValidColInput = True
-                
-                recievedValidUseRandomStartAnswer = False
-                while not recievedValidUseRandomStartAnswer:
-                    rawUseRandomStartAnswer = input("Would you like to start from a random position (y/n)?")
-                    match rawUseRandomStartAnswer:
-                        case "y":
-                            pass
-                        case "n":
-                            pass
-                        case _:
-                            print("Invalid input, please answer with \"y\" or \"n\"")
-                
-            case _:
-                print("Invalid input, please answer with \"y\" or \"n\"")
-
+    game = GameController.fromUserInput()
     game.run()
     print("Hello, World!")
 
