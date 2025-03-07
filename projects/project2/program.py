@@ -254,24 +254,32 @@ class GameController:
         print(self)
         #variables for tracking user input
         waitTime = 1
-        manuallyStep = False
+        manuallyStep = True
+        print("Currently manually stepping through simulation")
+        print("Press \"enter\" to step to next generation")
+        print("Use number keys to enable auto step through, and set speed")
+        print("Press \"q\" to quite")
+
         while not hasLooped:
-            #query for user input
+            #will set to True if detects user inputted enter
+            #if manuallyStep and not takeNextStep, will not progress to next iteration this loop
             takeNextStep = False
+            #query for user input
             if kbhit.kbhit():
                 key = kbhit.getch()
-                print(key)
-
                 match key:
                     case "q":
-                        print("ended by keyboard input")
+                        print("Ended by keyboard input")
                         break
                     case n if n.isdigit():
-                        manuallyStep = False
-                        waitTime = int(n)/4
+                        if manuallyStep:
+                            print("Enabled auto step through")
+                            print("Press \"enter\" to re-enable manual step through")
+                            manuallyStep = False
+                        waitTime = int(n)/4.5
                         print(f"set speed to {waitTime} seconds")
                     case "\r" if not manuallyStep:
-                        print("enabled manual step through")
+                        print("Enabled manual step through")
                         manuallyStep = True
                     case "\r":
                         takeNextStep = True
@@ -279,8 +287,6 @@ class GameController:
             if manuallyStep:
                 if not takeNextStep:
                     continue
-                else:
-                    pass
             else:
                 sleep(waitTime)
 
