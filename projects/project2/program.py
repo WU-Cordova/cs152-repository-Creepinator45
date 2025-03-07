@@ -252,22 +252,42 @@ class GameController:
         hasLooped: bool = False
         kbhit = KBHit()
         print(self)
+        #variables for tracking user input
+        waitTime = 1
+        manuallyStep = False
         while not hasLooped:
-            sleep(1)
+            #query for user input
+            takeNextStep = False
             if kbhit.kbhit():
                 key = kbhit.getch()
-
                 print(key)
 
-                #match key:
-                #    case "q":
-                #        print("ended by keyboard input")
-                #        break
-                #    case n if n.isdigit():
-                #        print(n)
+                match key:
+                    case "q":
+                        print("ended by keyboard input")
+                        break
+                    case n if n.isdigit():
+                        manuallyStep = False
+                        waitTime = int(n)/4
+                        print(f"set speed to {waitTime} seconds")
+                    case "\r" if not manuallyStep:
+                        print("enabled manual step through")
+                        manuallyStep = True
+                    case "\r":
+                        takeNextStep = True
+
+            if manuallyStep:
+                if not takeNextStep:
+                    continue
+                else:
+                    pass
+            else:
+                sleep(waitTime)
 
             self.nextIteration()
             print(self)
+
+            #check for match in grid history
             for i, grid in enumerate(self.__grids):
                 if i == self.__currentGridIndex:
                     continue
