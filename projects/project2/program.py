@@ -211,7 +211,7 @@ class GameController:
                 rawCoordinateInput = input(question)
                 try:
                     coordinate = rawCoordinateInput.split(",")
-                    x, y = coordinate[0], coordinate[1]
+                    x, y = int(coordinate[0]), int(coordinate[1])
                 except:
                     print("Invalid coordinate")
                     print("Proper formatting is \"x,y\"")
@@ -251,6 +251,7 @@ class GameController:
     def run(self):
         hasLooped: bool = False
         kbhit = KBHit()
+        print(self)
         while not hasLooped:
             sleep(1)
             if kbhit.kbhit():
@@ -270,15 +271,17 @@ class GameController:
             for i, grid in enumerate(self.__grids):
                 if i == self.__currentGridIndex:
                     continue
-                hasLooped = hasLooped or grid == self.__grids[self.__currentGridIndex]
-
+                if grid == self.__grids[self.__currentGridIndex]:
+                    print("Detected repeat")
+                    hasLooped = True
+        print("Ended simulation")
+    
     def __str__(self) -> str:
         return f"Generation {self.__iteration}\n{str(self.__grids[self.__currentGridIndex])}"
 
 def main():
     game = GameController.fromUserInput()
     game.run()
-    print("Hello, World!")
 
 if __name__ == '__main__':
     main()
