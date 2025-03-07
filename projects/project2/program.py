@@ -1,3 +1,4 @@
+from os import path
 from datastructures.array2d import Array2D, IArray2D
 from typing import Optional, Sequence, Iterator, TextIO
 from projects.project2.kbhit import KBHit
@@ -190,8 +191,76 @@ class GameController:
         return f"Generation {self.__iteration}\n{str(self.__grids[self.__currentGridIndex])}"
 
 def main():
-    with open(r"projects\project2\lifeConfig.txt", "r") as config:
-        game = GameController.fromConfig(config)
+    #input handling spaghetti. There's probably a better way to do this, but at least this way the program doesn't crash from 1 incorrect user input
+    #I hate doing UI
+    recievedValidUseConfigFileAnswer:bool = False
+    while not recievedValidUseConfigFileAnswer:
+        rawUseConfigFileAnswer = input("Read from config file (y/n)? ")
+        match rawUseConfigFileAnswer:
+            case "y":
+                recievedValidUseConfigFileAnswer = True
+
+                recievedValidConfigFile = False
+                while not recievedValidConfigFile:
+                    rawConfigFile = input("Config file path: ")
+                    try:
+                        with open(path.normpath(rawConfigFile), "r") as config:
+                            game = GameController.fromConfig(config)
+                    except:
+                        print("Invalid config file")
+                        continue
+                    else:
+                        recievedValidConfigFile = True
+            case "n":
+                recievedValidUseConfigFileAnswer = True
+
+                recievedValidHistoryLenInput = False
+                while not recievedValidHistoryLenInput:
+                    rawHistoryLenInput = input("How long is history length?")
+                    try:
+                        historyLen = int(rawHistoryLenInput)
+                    except:
+                        print("Invalid history length number")
+                        continue
+                    else:
+                        recievedValidHistoryLenInput = True
+                
+                recievedValidRowInput = False
+                while not recievedValidRowInput:
+                    rawRowInput = input("How many rows?")
+                    try:
+                        rows = int(rawRowInput)
+                    except:
+                        print("Invalid row number")
+                        continue
+                    else:
+                        recievedValidRowInput = True
+                
+                recievedValidColInput = False
+                while not recievedValidColInput:
+                    rawColInput = input("How many cols?")
+                    try:
+                        cols = int(rawColInput)
+                    except:
+                        print("Invalid col number")
+                        continue
+                    else:
+                        recievedValidColInput = True
+                
+                recievedValidUseRandomStartAnswer = False
+                while not recievedValidUseRandomStartAnswer:
+                    rawUseRandomStartAnswer = input("Would you like to start from a random position (y/n)?")
+                    match rawUseRandomStartAnswer:
+                        case "y":
+                            pass
+                        case "n":
+                            pass
+                        case _:
+                            print("Invalid input, please answer with \"y\" or \"n\"")
+                
+            case _:
+                print("Invalid input, please answer with \"y\" or \"n\"")
+
     game.run()
     print("Hello, World!")
 
