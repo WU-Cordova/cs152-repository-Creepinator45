@@ -1,11 +1,11 @@
-from datastructures.array2d import Array2D, IArray2D
+from datastructures.array2d import Array2D
 from typing import Iterator
 from random import random
 from projects.project2.cell import Cell
 
 class Grid:
     def __init__(self, rows: int = 32, cols: int = 32) -> None:
-        self.__grid: IArray2D = Array2D.empty(rows, cols, Cell)
+        self.__grid: Array2D = Array2D.empty(rows, cols, Cell)
 
         #setup boarder
         for cell in self.__grid[0]:
@@ -17,7 +17,7 @@ class Grid:
             row[-1]._Cell__isBoarder = True
     
     @staticmethod
-    def randomGrid(rows: int = 32, cols: int = 32) -> Array2D:
+    def randomGrid(rows: int = 32, cols: int = 32) -> "Grid":
         grid = Grid(rows, cols)
         for _, cell in grid:
             if random() < 0.5:
