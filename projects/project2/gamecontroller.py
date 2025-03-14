@@ -11,6 +11,7 @@ class GameController:
     def __init__(self, rows: int = 32, cols: int = 32, history_length:int = 5) -> None:
         self.__dimensions: tuple[int, int] = (rows, cols)
         #this would be better as a fixed length array instead than a list, but I'd rather it hold references instead of deepcopies, so our Array implementation is unsuitable
+        #edit: with how I ended up implementing this I don't think storing these as references ended up mattering. It might be more correct to store these within our Array type, but I don't think it matters enough to change
         self.__grids: list[Grid] = [Grid(*self.__dimensions) for _ in range(history_length+1)]
         self.__grids[0] = Grid.randomGrid(*self.__dimensions)
         self.__iteration: int = 0
@@ -139,6 +140,7 @@ class GameController:
                 return GameController(rows, cols, historyLen)
         
     def nextIteration(self):
+        #grid history is tracked using a circular array, overwriting the oldest grid with the newest one
         self.__iteration += 1
         self.__currentGridIndex = self.__iteration % len(self.__grids)
 
