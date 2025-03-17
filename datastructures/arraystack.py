@@ -2,6 +2,7 @@ import os
 
 from datastructures.array import Array, T
 from datastructures.istack import IStack
+from copy import deepcopy
 
 class ArrayStack(IStack[T]):
     ''' ArrayStack class that implements the IStack interface. The ArrayStack is a 
@@ -14,19 +15,24 @@ class ArrayStack(IStack[T]):
                 max_size: int -- The maximum size of the stack. 
                 data_type: type -- The data type of the stack.       
         '''
-        
+        self.__top = -1
+        self.__stack = Array([data_type()]*max_size, data_type=data_type)
 
     def push(self, item: T) -> None:
-        raise NotImplementedError
+        self.__top += 1
+        self.__stack[self.__top] = item
 
     def pop(self) -> T:
-       raise NotImplementedError
+        topItem = self.peek()
+        self.__top -= 1
+        return topItem
 
     def clear(self) -> None:
-       raise NotImplementedError
+        self.__top = -1
+
     @property
     def peek(self) -> T:
-       raise NotImplementedError
+        return self.__stack[self.__top]
 
     @property
     def maxsize(self) -> int:
@@ -35,7 +41,7 @@ class ArrayStack(IStack[T]):
             Returns:
                 int: The maximum size of the stack.
         '''
-        raise NotImplementedError    
+        return len(self.__stack) 
     @property
     def full(self) -> bool:
         ''' Returns True if the stack is full, False otherwise. 
@@ -43,22 +49,31 @@ class ArrayStack(IStack[T]):
             Returns:
                 bool: True if the stack is full, False otherwise.
         '''
-        raise NotImplementedError
+        return self.__top+1 == self.maxsize
 
     @property
     def empty(self) -> bool:
-        raise NotImplementedError
+        return self.__top == -1
+    
     def __eq__(self, other: object) -> bool:
-       raise NotImplementedError
+        if len(self) != len(other):
+            return False
+        #should I be making a deepcopy of self as well?
+        other_copy = deepcopy(other)
+        #slicing our array type is inefficient, this could be made more efficient by avoiding doing that
+        for item in reversed(self.__stack[0:self.__top]):
+            if item != other_copy.pop():
+                return False
 
     def __len__(self) -> int:
-       raise NotImplementedError
+        return self.__top+1
     
     def __contains__(self, item: T) -> bool:
-       raise NotImplementedError
+        #slicing our array type is inefficient, so this could be made more efficient but less readable by writing contains from scratch rather than leveraging our array type's contains function
+        return item in self.__stack[0:self.__top]
 
     def __str__(self) -> str:
-        return str([self.stack[i] for i in range(self._top)])
+        return str([self.__stack[i] for i in range(self.__top)])
     
     def __repr__(self) -> str:
         return f"ArrayStack({self.maxsize}): items: {str(self)}"

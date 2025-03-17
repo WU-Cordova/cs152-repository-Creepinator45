@@ -20,7 +20,7 @@ class CircularQueue(IQueue[T]):
         '''
         self.__front_index = 0
         self.__rear_index = 0
-        self.__circularQueue = Array([data_type] * maxsize, data_type=data_type)
+        self.__circularQueue = Array([data_type()] * maxsize, data_type=data_type)
 
     def enqueue(self, item: T) -> None:
         ''' Adds an item to the rear of the queue
