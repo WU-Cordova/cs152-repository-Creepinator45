@@ -18,7 +18,9 @@ class CircularQueue(IQueue[T]):
                 maxsize: The maximum size of the queue
                 data_type: The type of the elements in the queue
         '''
-        raise NotImplementedError
+        self.__front_index = 0
+        self.__rear_index = 0
+        self.__circularQueue = Array([data_type] * maxsize, data_type=data_type)
 
     def enqueue(self, item: T) -> None:
         ''' Adds an item to the rear of the queue
