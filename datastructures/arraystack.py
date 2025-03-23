@@ -34,6 +34,8 @@ class ArrayStack(IStack[T]):
 
     @property
     def peek(self) -> T:
+        if self.empty:
+            raise IndexError
         return self.__stack[self.__top]
 
     @property
