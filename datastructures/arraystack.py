@@ -23,7 +23,9 @@ class ArrayStack(IStack[T]):
         self.__stack[self.__top] = item
 
     def pop(self) -> T:
-        topItem = self.peek()
+        if self.empty:
+            raise IndexError
+        topItem = self.peek
         self.__top -= 1
         return topItem
 
@@ -61,9 +63,10 @@ class ArrayStack(IStack[T]):
         #should I be making a deepcopy of self as well?
         other_copy = deepcopy(other)
         #slicing our array type is inefficient, this could be made more efficient by avoiding doing that
-        for item in reversed(self.__stack[0:self.__top]):
+        for item in reversed(self.__stack[0:self.__top+1]):
             if item != other_copy.pop():
                 return False
+        return True
 
     def __len__(self) -> int:
         return self.__top+1
@@ -73,7 +76,7 @@ class ArrayStack(IStack[T]):
         return item in self.__stack[0:self.__top]
 
     def __str__(self) -> str:
-        return str([self.__stack[i] for i in range(self.__top)])
+        return str([self.__stack[i] for i in range(len(self))])
     
     def __repr__(self) -> str:
         return f"ArrayStack({self.maxsize}): items: {str(self)}"
