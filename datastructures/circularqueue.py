@@ -2,6 +2,7 @@ from typing import Any
 
 from datastructures.array import Array
 from datastructures.iqueue import IQueue, T
+from copy import deepcopy
 
 class CircularQueue(IQueue[T]):
     """ Represents a fixed-size circular queue. The queue
@@ -20,7 +21,7 @@ class CircularQueue(IQueue[T]):
         '''
         self.__front_index = 0
         self.__rear_index = 0
-        self.__circularQueue = Array([data_type()] * maxsize, data_type=data_type)
+        self.__circularQueue = Array([data_type()] * maxsize+1, data_type=data_type)
 
     def enqueue(self, item: T) -> None:
         ''' Adds an item to the rear of the queue
@@ -47,7 +48,8 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is full
         '''
-        raise NotImplementedError
+        self.__circularQueue[self.__rear_index] == item
+        self.__rear_index = self.__circularIncrement(self.__rear_index)
 
     def dequeue(self) -> T:
         ''' Removes and returns the item at the front of the queue
@@ -74,11 +76,13 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is empty
         '''
-        raise NotImplementedError
+        frontItem = self.__circularQueue[self.__front_index]
+        self.__front_index = self.__circularIncrement(self.__front_index)
+        return frontItem
 
     def clear(self) -> None:
         ''' Removes all items from the queue '''
-        raise NotImplementedError
+        self.__front_index = self.__rear_index
 
     @property
     def front(self) -> T:
@@ -90,7 +94,7 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is empty
         '''
-        raise NotImplementedError
+        return self.__circularQueue[self.__front_index]
 
     @property
     def full(self) -> bool:
@@ -99,7 +103,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 True if the queue is full, False otherwise
         '''
-        raise NotImplementedError
+        return self.__circularIncrement(self.__rear_index) == self.__front_index
 
     @property
     def empty(self) -> bool:
@@ -108,7 +112,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 True if the queue is empty, False otherwise
         '''
-        raise NotImplementedError
+        return self.__rear_index == self.__front_index
     
     @property
     def maxsize(self) -> int:
@@ -117,7 +121,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 The maximum size of the queue
         '''
-        raise NotImplementedError
+        return len(self.__circularQueue)
 
     def __eq__(self, other: object) -> bool:
         ''' Returns True if this CircularQueue is equal to another object, False otherwise
@@ -132,7 +136,16 @@ class CircularQueue(IQueue[T]):
             Returns:
                 True if this CircularQueue is equal to another object, False otherwise
         '''
-        raise NotImplementedError   
+        if len(self) != len(other):
+            return False
+
+        other_copy = deepcopy(other)
+        self_copy = deepcopy(self)
+
+        for _ in len(self):
+            if self_copy.dequeue() != other_copy.dequeue():
+                return False
+        return True
     
     def __len__(self) -> int:
         ''' Returns the number of items in the queue
@@ -140,7 +153,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 The number of items in the queue
         '''
-        raise NotImplementedError
+        return (self.__rear_index - self.__front_index) % self.maxsize
 
     def __str__(self) -> str:
         ''' Returns a string representation of the CircularQueue
@@ -148,7 +161,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 A string representation of the queue
         '''
-        return str(self.circularqueue)
+        return str(self.__circularQueue)
 
     def __repr__(self) -> str:
         ''' Returns a developer string representation of the CircularQueue object
@@ -156,5 +169,7 @@ class CircularQueue(IQueue[T]):
             Returns:
                 A string representation of the CircularQueue object
         '''
-        return f'ArrayQueue({repr(self.circularqueue)})'
+        return f'ArrayQueue({repr(self.__circularQueue)})'
                                   
+    def __circularIncrement(self, index: int) -> int:
+        return (index + 1) % self.maxsize
