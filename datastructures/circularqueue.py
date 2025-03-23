@@ -21,7 +21,7 @@ class CircularQueue(IQueue[T]):
         '''
         self.__front_index = 0
         self.__rear_index = 0
-        self.__circularQueue = Array([data_type()] * maxsize+1, data_type=data_type)
+        self.__circularQueue = Array([data_type()] * (maxsize+1), data_type=data_type)
 
     def enqueue(self, item: T) -> None:
         ''' Adds an item to the rear of the queue
@@ -48,7 +48,7 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is full
         '''
-        self.__circularQueue[self.__rear_index] == item
+        self.__circularQueue[self.__rear_index] = item
         self.__rear_index = self.__circularIncrement(self.__rear_index)
 
     def dequeue(self) -> T:
@@ -142,7 +142,7 @@ class CircularQueue(IQueue[T]):
         other_copy = deepcopy(other)
         self_copy = deepcopy(self)
 
-        for _ in len(self):
+        for _ in range(len(self)):
             if self_copy.dequeue() != other_copy.dequeue():
                 return False
         return True
