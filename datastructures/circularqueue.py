@@ -48,6 +48,8 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is full
         '''
+        if self.full:
+            raise IndexError("Queue is full")
         self.__circularQueue[self.__rear_index] = item
         self.__rear_index = self.__circularIncrement(self.__rear_index)
 
@@ -76,6 +78,8 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is empty
         '''
+        if self.empty:
+            raise IndexError("Queue is empty")
         frontItem = self.__circularQueue[self.__front_index]
         self.__front_index = self.__circularIncrement(self.__front_index)
         return frontItem
@@ -94,6 +98,8 @@ class CircularQueue(IQueue[T]):
             Raises:
                 IndexError: If the queue is empty
         '''
+        if self.empty:
+            raise IndexError("Queue is empty")
         return self.__circularQueue[self.__front_index]
 
     @property
@@ -161,7 +167,10 @@ class CircularQueue(IQueue[T]):
             Returns:
                 A string representation of the queue
         '''
-        return str(self.__circularQueue)
+        #This is super inefficient, but it at least avoids printing junk data
+        self_copy = deepcopy(self)
+        to_print = [self_copy.dequeue() for _ in range(len(self_copy))]
+        return str(to_print)
 
     def __repr__(self) -> str:
         ''' Returns a developer string representation of the CircularQueue object
