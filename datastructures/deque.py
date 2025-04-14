@@ -139,7 +139,7 @@ class Deque[T](IQueue[T]):
         """
         Clears all items from the deque.
         """
-        self.__queue.clear
+        self.__queue.clear()
 
     def __str__(self) -> str:
         """
