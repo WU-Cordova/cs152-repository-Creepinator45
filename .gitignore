@@ -158,8 +158,6 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-datastructures/array.zip
-datastructures/array2d.zip
-datastructures/arraystack.zip
-datastructures/bag.zip
-datastructures/circularqueue.zip
+
+#zip files for submission to Pedalogical for static analyisis
+datastructures/zips
