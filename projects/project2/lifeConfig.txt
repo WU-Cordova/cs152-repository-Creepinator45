@@ -1,0 +1,36 @@
+#lines starting with # will be ignored
+#Blank lines are not allowed
+#the first non-commented line will be the length of the tracked history
+5
+#The second non-commented line will be the length in x
+30
+#The third non-commented line will be the length in y
+25
+#all subsequent non-commented lines will be the starting cell arrangement
+#- is a dead cell, x is a live cell
+xx----------------------------
+x-----------------------------
+-------------------xxx--------
+#white space within lines will be ignored
+-   x x x---     - - --x xx----------------
+- - - - - - - - - - - - - - - - - - - - x - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - x - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #everything after a # will also be ignored
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - x x - - - - - - - - - - - - - - - - - - - -
+- - - - - - - x x - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - x - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - x - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - x - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - x x - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - x - - -
