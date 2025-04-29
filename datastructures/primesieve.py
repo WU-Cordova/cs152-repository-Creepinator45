@@ -62,7 +62,8 @@ class PrimeSieve:
     def __init__(self):
         self.__sieve: list[PrimeSieve.SieveEntry] = []
         heappush(self.__sieve, PrimeSieve.SieveEntry.from_prime(2))
-        self.__primes: list[int] = [2]
+        heappush(self.__sieve, PrimeSieve.SieveEntry.from_prime(3))
+        self.__primes: list[int] = [2, 3]
     
     def __getitem__(self, prime_index:int) -> int:
         if prime_index < len(self.__primes):
@@ -82,7 +83,7 @@ class PrimeSieve:
         return f"PrimeSieve(primes: {repr(self.__primes)}, sieve: {repr(self.__sieve)})"
     
     def __next_prime(self) -> int:
-        num = self.__primes[-1] + 1
+        num = self.__primes[-1] + 2
         while True:
             if num < self.__sieve[0].entry:
                 heappush(self.__sieve, PrimeSieve.SieveEntry.from_prime(num))
@@ -90,6 +91,6 @@ class PrimeSieve:
                 return num
             
             if num == self.__sieve[0].entry:
-                num += 1
+                num += 2
             
             heapreplace(self.__sieve, self.__sieve[0].increment())
