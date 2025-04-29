@@ -94,7 +94,13 @@ class HashMap(IHashMap[KT, VT]):
                 yield link.key
     
     def __eq__(self, other: object) -> bool:
-        raise NotImplementedError("HashMap.__eq__() is not implemented yet.")
+        if not isinstance(other, HashMap):
+            return False
+        #If self and other contain the same values but are hashed differently this will give false. Idk if that's correct behavior or if I need to think of a way to correct that
+        for ((k1, v1), (k2, v2)) in zip(self.items(), other.items()):
+            if (k1 != k2) or (v1 != v2):
+                return False
+        return True
 
     def __str__(self) -> str:
         return "{" + ", ".join(f"{key}: {value}" for key, value in self) + "}"
